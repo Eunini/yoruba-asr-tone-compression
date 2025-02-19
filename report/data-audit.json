@@ -1,0 +1,56 @@
+{
+  "dataset": "google/WaxalNLP",
+  "revision": "5f4d8ca24f2b9d168b2ee545f1febaaff4b40580",
+  "config": "yor_tts",
+  "checked_at": "2026-10-25T20:59:29.109000+00:00",
+  "yoruba_asr_available": false,
+  "task": "TTS recordings repurposed for ASR; not an official Yoruba ASR subset",
+  "license": "CC-BY-SA-4.0 (Media Trust subset; verify upstream before redistribution)",
+  "partial": false,
+  "splits": {
+    "test": {
+      "rows": 177,
+      "hours": 1.561706666666667,
+      "seconds": 5622.144000000001,
+      "unique_speakers": 8,
+      "tone_marked_rows": 175
+    },
+    "validation": {
+      "rows": 201,
+      "hours": 1.7847666666666666,
+      "seconds": 6425.16,
+      "unique_speakers": 8,
+      "tone_marked_rows": 200
+    },
+    "train": {
+      "rows": 2233,
+      "hours": 19.168713333333372,
+      "seconds": 69007.36800000013,
+      "unique_speakers": 8,
+      "tone_marked_rows": 2063
+    }
+  },
+  "overlap": {
+    "test:validation": {
+      "exact_transcripts": 0,
+      "speakers": 8
+    },
+    "test:train": {
+      "exact_transcripts": 4,
+      "speakers": 8
+    },
+    "validation:train": {
+      "exact_transcripts": 5,
+      "speakers": 8
+    }
+  },
+  "training_deduplication": {
+    "original": 2233,
+    "retained": 2216,
+    "removed": 17
+  },
+  "training_length_filter_preview": {
+    "retained_at_most_30_seconds": 1691,
+    "excluded_longer_than_30_seconds": 525
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "scope": "Shared development host; these timings do not establish controlled serving speedups",
+  "software": {
+    "faster-whisper": "1.2.1",
+    "ctranslate2": "4.8.4",
+    "av": "15.1.0",
+    "datasets": "3.6.0",
+    "jiwer": "4.0.0"
+  },
+  "pretrained_tiny_revision": "d90ca5fe260221311c53c58e660288d3deb8d356"
+}
