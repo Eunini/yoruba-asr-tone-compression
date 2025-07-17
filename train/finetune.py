@@ -132,6 +132,7 @@ def main():
         processing_class=processor,
     )
     trainer.train()
+    trainer.model.config.use_cache = True
     trainer.save_model(str(args.out / "best"))
     processor.save_pretrained(args.out / "best")
     (args.out / "selection.json").write_text(

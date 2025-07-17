@@ -22,7 +22,7 @@ def main():
             {
                 "title": "Yoruba ASR tone compression research code",
                 "id": a.owner + "/yoruba-asr-tone-code",
-                "licenses": [{"name": "copyright-authors"}],
+                "licenses": [{"name": "other"}],
                 "description": "Private source-code snapshot. The archive includes its MIT code license and dataset attribution; no source audio or credentials are bundled.",
             },
             indent=2,

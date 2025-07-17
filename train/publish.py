@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from pathlib import Path
 
 from huggingface_hub import HfApi
@@ -58,7 +59,11 @@ be read with WER and coverage. Explicit mid tones are not measured. No fitness
 for consequential decisions or all Yoruba dialects has been established.
 """
     (best / "README.md").write_text(card)
-    api = HfApi()
+    token_path = Path.home() / ".cache/huggingface/token"
+    token = os.environ.get("HF_TOKEN") or token_path.read_text().strip()
+    api = HfApi(token=token)
+    if api.whoami()["name"] != a.repo_id.split("/")[0]:
+        raise ValueError("Unexpected Hugging Face publishing identity")
     api.create_repo(a.repo_id, exist_ok=True)
     api.upload_folder(
         repo_id=a.repo_id,
