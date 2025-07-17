@@ -86,7 +86,7 @@ def backend(args):
                     if args.backend == "mms":
                         tokens = model(**inputs).logits.argmax(-1)
                     else:
-                        tokens = model.generate(**inputs, max_new_tokens=225, do_sample=False)
+                        tokens = model.generate(**inputs, max_length=448, do_sample=False)
                 texts.append(processor.batch_decode(tokens, skip_special_tokens=True)[0])
             return " ".join(texts)
 

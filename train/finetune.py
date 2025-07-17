@@ -85,7 +85,15 @@ def main():
                 "labels": processor.tokenizer(row["reference"]).input_ids,
             }
 
-        return ds.map(preprocess, remove_columns=ds.column_names)
+        prepared = ds.map(preprocess, remove_columns=ds.column_names)
+        usable = prepared.filter(
+            lambda row: len(row["labels"]) <= model.config.max_target_positions
+        )
+        exclusions[split]["excluded_over_decoder_token_limit"] = len(prepared) - len(usable)
+        exclusions[split]["retained_after_all_filters"] = len(usable)
+        if not len(usable):
+            raise ValueError(f"No examples fit the decoder context in {split}")
+        return usable
 
     def metrics(prediction):
         labels = np.where(
@@ -114,7 +122,7 @@ def main():
         save_total_limit=2,
         save_only_model=True,
         predict_with_generate=True,
-        generation_max_length=225,
+        generation_max_length=448,
         load_best_model_at_end=True,
         metric_for_best_model="wer",
         greater_is_better=False,
