@@ -41,6 +41,7 @@ compression question on their own.
 <!-- RESULTS -->
 | Model | Precision | Test recordings | WER | Conditional TER | Matched words | Local RTF | Cloud cost |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| faster-whisper-small | float32 | 177 | 110.76% | 100.00% | 1.01% | 0.710 | Not measured |
 | faster-whisper-tiny | float32 | 177 | 123.97% | 100.00% | 1.85% | 0.153 | Not measured |
 | faster-whisper-tiny | int8 | 177 | 122.16% | 100.00% | 2.57% | 0.063 | Not measured |
 <!-- /RESULTS -->

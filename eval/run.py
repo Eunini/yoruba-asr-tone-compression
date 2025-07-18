@@ -4,6 +4,7 @@ import argparse
 import hashlib
 import json
 import platform
+import contextlib
 import subprocess
 import tempfile
 import time
@@ -92,6 +93,40 @@ def backend(args):
 
         return transcribe
     if args.backend == "cpp":
+        if args.cpp_server_url:
+            import httpx
+
+            # Start whisper-server once with this exact --model and --threads.
+            # Multipart form fields match the pinned upstream server interface.
+            client = httpx.Client(timeout=600)
+
+            def transcribe(path):
+                with open(path, "rb") as audio:
+                    response = client.post(
+                        args.cpp_server_url.rstrip("/") + "/inference",
+                        files={
+                            "file": (Path(path).name, audio, "audio/wav"),
+                            **{
+                                k: (None, v)
+                                for k, v in {
+                                    "language": "yo",
+                                    "response_format": "json",
+                                    "beam_size": "1",
+                                    "best_of": "1",
+                                    "temperature": "0",
+                                    "temperature_inc": "0",
+                                    "vad": "false",
+                                    "max_context": "0",
+                                    "no_timestamps": "true",
+                                }.items()
+                            },
+                        },
+                    )
+                response.raise_for_status()
+                return response.json()["text"].strip()
+
+            transcribe.close = client.close
+            return transcribe
 
         def transcribe(path):
             with tempfile.TemporaryDirectory() as tmp:
@@ -136,6 +171,9 @@ def main():
     parser.add_argument("--threads", type=int, default=4)
     parser.add_argument("--model-cache", default="models")
     parser.add_argument("--cpp-binary", default="whisper-cli")
+    parser.add_argument(
+        "--cpp-server-url", help="Persistent whisper-server root, e.g. http://127.0.0.1:8080"
+    )
     parser.add_argument("--limit", type=int)
     parser.add_argument("--out", type=Path, required=True)
     parser.add_argument("--server-hourly-usd", type=float)
@@ -143,6 +181,10 @@ def main():
     args = parser.parse_args()
     if args.server_hourly_usd is not None and (args.server_hourly_usd < 0 or not args.price_source):
         parser.error("A nonnegative hourly price requires a public --price-source URL")
+    if args.backend == "cpp" and not args.cpp_server_url and args.server_hourly_usd is not None:
+        parser.error(
+            "Steady-state cost requires --cpp-server-url; whisper-cli reloads weights per file"
+        )
     rows = [json.loads(line) for line in args.manifest.read_text().splitlines() if line.strip()]
     if args.limit:
         rows = rows[: args.limit]
@@ -154,7 +196,10 @@ def main():
     transcribe(rows[0]["audio"])  # Fixed warmup excluded from steady-state timing.
     args.out.mkdir(parents=True, exist_ok=True)
     predictions = []
-    with (args.out / "predictions.jsonl").open("w") as stream:
+    with contextlib.ExitStack() as stack:
+        if hasattr(transcribe, "close"):
+            stack.callback(transcribe.close)
+        stream = stack.enter_context((args.out / "predictions.jsonl").open("w"))
         for row in rows:
             start = time.perf_counter()
             hypothesis = transcribe(row["audio"])
@@ -184,6 +229,12 @@ def main():
         "n": len(rows),
         "partial": args.limit is not None,
         "load_seconds": load_seconds,
+        "timing_scope": (
+            "process startup and model load per utterance; not steady-state"
+            if args.backend == "cpp" and not args.cpp_server_url
+            else "warm persistent model; excludes initial load and one warmup"
+        ),
+        "cpp_server_url": args.cpp_server_url,
         "manifest_sha256": hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
         "evaluation_set_sha256": hashlib.sha256(
             json.dumps(

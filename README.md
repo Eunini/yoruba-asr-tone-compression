@@ -21,6 +21,7 @@ does **not** measure generalization to unseen speakers.
 
 | Model | Precision | Test recordings | WER | Conditional TER | Matched words | Local RTF | Cloud cost |
 | --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
+| faster-whisper-small | float32 | 177 | 110.76% | 100.00% | 1.01% | 0.710 | Not measured |
 | faster-whisper-tiny | float32 | 177 | 123.97% | 100.00% | 1.85% | 0.153 | Not measured |
 | faster-whisper-tiny | int8 | 177 | 122.16% | 100.00% | 2.57% | 0.063 | Not measured |
 
@@ -65,11 +66,16 @@ Checkpoints are selected by validation WER. Utterances longer than 30 seconds ar
 excluded as whole examples during training and validation checkpoint selection;
 the counts are saved. The complete test set remains intact. Each size has four
 conditions—float, int8, q5_0 and q4_0—so the complete matrix has **12 versions**.
-Record the exact source commits of both converter repositories.
+Record the exact source commits of both converter repositories. The converter also
+exports CT2 float32 and retains the whisper.cpp f16 file as controls. Compare
+quantized versions with the full-precision control from the same backend, since
+conversion and decoding can change results independently of quantization.
 
 ```bash
+/path/to/whisper-server -m models/tiny/ggml-model-q4_0.bin -t 4 --host 127.0.0.1 --port 8080
+# In a second terminal; server/model/thread settings must match:
 python -m eval.run --manifest data/prepared/test.jsonl --backend cpp \
-  --model models/tiny/ggml-model-q4_0.bin --cpp-binary /path/to/whisper-cli \
+  --model models/tiny/ggml-model-q4_0.bin --cpp-server-url http://127.0.0.1:8080 \
   --out report/runs/tiny-q4
 python -m eval.error_review report/runs/tiny-q4/predictions.jsonl
 python -m eval.report report/runs/*/summary.json
@@ -79,6 +85,9 @@ For CPU cloud runs, supply `--server-hourly-usd` and a public `--price-source` U
 Cost per audio hour is `real_time_factor × hourly_server_price`. Keep hardware,
 thread count, decoding settings, sample set and warmup fixed across comparisons.
 The local shared-host timings are exploratory and cannot establish cloud costs.
+The CLI fallback includes process/model startup for every recording and is rejected
+for steady-state cost calculations. The persistent server includes local HTTP and
+audio-upload overhead; record it when comparing backends.
 
 WER removes only U+0300 and U+0301 after Unicode NFD; underdots in ẹ, ọ and ṣ
 survive. TER compares explicit-tone sequences **only inside words that match

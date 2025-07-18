@@ -31,7 +31,7 @@ def main():
         "cost_per_audio_hour_usd",
     ]
     with (args.out / "results.csv").open("w") as stream:
-        writer = csv.DictWriter(stream, fields, extrasaction="ignore")
+        writer = csv.DictWriter(stream, fields, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
     fig, ax = plt.subplots(figsize=(8, 5))

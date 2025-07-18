@@ -10,7 +10,7 @@ requires-python = ">=3.10"
 dependencies = ["jiwer>=4,<5", "datasets>=3.6,<4", "huggingface-hub>=0.34,<1", "soundfile>=0.13,<1", "scipy>=1.14,<2", "matplotlib>=3.9,<4"]
 
 [project.optional-dependencies]
-inference = ["faster-whisper>=1.2,<2", "av>=13,<16"]
+inference = ["faster-whisper>=1.2,<2", "av>=13,<16", "httpx>=0.28,<1"]
 training = ["torch>=2.5,<3", "transformers>=4.45,<5", "accelerate>=1,<2", "librosa>=0.10,<1", "evaluate>=0.4,<1"]
 report = ["reportlab>=4,<5"]
 dev = ["pytest>=8,<9", "ruff>=0.12,<1"]

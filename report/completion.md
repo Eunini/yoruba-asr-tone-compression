@@ -9,6 +9,6 @@
   measurement, manual/native review of 50 outputs, and model publication.
 - Pending: a speaker-independent corpus such as FLEURS or YORÙLECT as a distinct
   generalization test. Do not silently substitute it for the published WAXAL test.
-- GPU, Kaggle and Hugging Face authentication were unavailable at initial setup.
+- Kaggle, Hugging Face and AWS credentials are connected. Kaggle accepts GPU/internet metadata, but the private runtime diagnostic reports CPU-only Torch, zero CUDA devices and DNS failure. Training has not started; account/runtime settings require resolution.
 
 The scientific project is not complete merely because its code passes tests.
