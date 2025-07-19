@@ -13,6 +13,8 @@ from pathlib import Path
 
 from eval.metrics import score
 from eval.artifacts import fingerprint
+from eval.audio import chunks
+from train.model_revisions import REVISIONS
 
 
 def backend(args):
@@ -25,6 +27,7 @@ def backend(args):
             compute_type=args.compute_type,
             cpu_threads=args.threads,
             download_root=args.model_cache,
+            revision=args.revision,
         )
 
         def transcribe(path):
@@ -53,16 +56,19 @@ def backend(args):
         from math import gcd
 
         if args.backend == "mms":
-            processor = AutoProcessor.from_pretrained(args.model)
+            processor = AutoProcessor.from_pretrained(args.model, revision=args.revision)
             processor.tokenizer.set_target_lang("yor")
             model = Wav2Vec2ForCTC.from_pretrained(
-                args.model, target_lang="yor", ignore_mismatched_sizes=True
+                args.model, ignore_mismatched_sizes=True, revision=args.revision
             )
+            model.load_adapter("yor", revision=args.revision)
         else:
             processor = WhisperProcessor.from_pretrained(
-                args.model, language="yo", task="transcribe"
+                args.model, language="yo", task="transcribe", revision=args.revision
             )
-            model = WhisperForConditionalGeneration.from_pretrained(args.model)
+            model = WhisperForConditionalGeneration.from_pretrained(
+                args.model, revision=args.revision
+            )
             model.generation_config.language = "yo"
             model.generation_config.task = "transcribe"
             model.generation_config.forced_decoder_ids = None
@@ -75,13 +81,13 @@ def backend(args):
             if sr != 16000:
                 divisor = gcd(sr, 16000)
                 signal = resample_poly(signal, 16000 // divisor, sr // divisor)
-            chunks = (
-                [signal[i : i + 480000] for i in range(0, len(signal), 480000)]
-                if args.backend in {"whisper", "mms"}
-                else [signal]
-            )
             texts = []
-            for chunk in chunks:
+            for chunk in chunks(signal):
+                if args.backend == "mms" and len(chunk) < 400:
+                    # Wav2Vec2's convolutional receptive field needs 400 samples.
+                    import numpy as np
+
+                    chunk = np.pad(chunk, (0, 400 - len(chunk)))
                 inputs = processor(chunk, sampling_rate=16000, return_tensors="pt").to(args.device)
                 with torch.inference_mode():
                     if args.backend == "mms":
@@ -166,6 +172,9 @@ def main():
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--backend", choices=["ct2", "whisper", "mms", "cpp"], required=True)
     parser.add_argument("--model", required=True)
+    parser.add_argument(
+        "--revision", help="Pinned public weights commit; known study models have defaults"
+    )
     parser.add_argument("--device", default="cpu")
     parser.add_argument("--compute-type", default="int8")
     parser.add_argument("--threads", type=int, default=4)
@@ -179,6 +188,7 @@ def main():
     parser.add_argument("--server-hourly-usd", type=float)
     parser.add_argument("--price-source")
     args = parser.parse_args()
+    args.revision = args.revision or REVISIONS.get(args.model)
     if args.server_hourly_usd is not None and (args.server_hourly_usd < 0 or not args.price_source):
         parser.error("A nonnegative hourly price requires a public --price-source URL")
     if args.backend == "cpp" and not args.cpp_server_url and args.server_hourly_usd is not None:
@@ -220,6 +230,7 @@ def main():
         "status": "measured",
         "artifacts": fingerprint(args.model),
         "model": args.model,
+        "source_revision": args.revision,
         "backend": args.backend,
         "compute_type": args.compute_type if args.backend == "ct2" else "backend default",
         "device": args.device,
@@ -245,7 +256,7 @@ def main():
         ).hexdigest(),
         "metric_policy": "explicit-tone-sequence edits conditional on matching words; v1",
         "segmentation": (
-            "consecutive nonoverlapping 30s chunks"
+            "nonoverlapping <=30s chunks; final tail >=1s for split audio; MMS pads original <400-sample inputs"
             if args.backend in {"whisper", "mms"}
             else "backend-native long-audio segmentation"
         ),

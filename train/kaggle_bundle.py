@@ -51,23 +51,32 @@ subprocess.run([sys.executable, '-m', 'data.prepare'], check=True)
 """
     bootstrap = bootstrap.replace("__CODE_B64__", base64.b64encode(archive).decode())
     bootstrap = bootstrap.replace("__CODE_SHA__", hashlib.sha256(archive).hexdigest())
-    study = """import shutil
+    study = """import shutil, json
 output = pathlib.Path('/kaggle/working/research-artifacts')
 output.mkdir(exist_ok=True)
 shutil.copy('data/prepared/audit.json', output / 'data-audit.json')
-for backend, model in [('whisper', 'openai/whisper-small'), ('mms', 'facebook/mms-1b-all')]:
-    subprocess.run([sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
-                    '--backend', backend, '--model', model, '--device', 'cuda',
-                    '--out', str(output / ('baseline-' + backend))], check=True)
+jobs = []
+def run_job(name, command):
+    status = subprocess.run(command).returncode
+    jobs.append({'job':name, 'return_code':status})
+    (output/'job-status.json').write_text(json.dumps(jobs,indent=2))
+    return status == 0
+# Independent stages retain their artifacts even if another stage fails.
 for size in ['tiny', 'base', 'small']:
     destination = output / size
-    subprocess.run([sys.executable, '-m', 'train.finetune', '--size', size,
-                    '--out', str(destination), '--steps', '2000'], check=True)
-    subprocess.run([sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
+    if run_job('train-'+size, [sys.executable, '-m', 'train.finetune', '--size', size,
+                    '--out', str(destination), '--steps', '2000']):
+        run_job('test-'+size, [sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
                     '--backend', 'whisper', '--model', str(destination / 'best'),
-                    '--device', 'cuda', '--out', str(destination / 'test-float')], check=True)
+                    '--device', 'cuda', '--out', str(destination / 'test-float')])
+for backend, model in [('whisper', 'openai/whisper-small'), ('mms', 'facebook/mms-1b-all')]:
+    run_job('baseline-'+backend, [sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
+                    '--backend', backend, '--model', model, '--device', 'cuda',
+                    '--out', str(output / ('baseline-' + backend))])
 print('Selected models and GPU evaluations are in', output)
 print('Compression, controlled CPU costs, and native error review remain separate stages.')
+if any(job['return_code'] for job in jobs):
+    raise RuntimeError('Some stages failed; job-status.json records them. Successful artifacts are retained.')
 """
     cells = [
         {

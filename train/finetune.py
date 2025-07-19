@@ -9,6 +9,7 @@ import numpy as np
 
 from eval.metrics import score
 from eval.artifacts import fingerprint
+from train.model_revisions import REVISIONS
 
 
 @dataclass
@@ -54,8 +55,11 @@ def main():
         raise RuntimeError("GPU required for the planned fp16 experiment")
     set_seed(args.seed)
     model_id = f"openai/whisper-{args.size}"
-    processor = WhisperProcessor.from_pretrained(model_id, language="yo", task="transcribe")
-    model = WhisperForConditionalGeneration.from_pretrained(model_id)
+    revision = REVISIONS[model_id]
+    processor = WhisperProcessor.from_pretrained(
+        model_id, language="yo", task="transcribe", revision=revision
+    )
+    model = WhisperForConditionalGeneration.from_pretrained(model_id, revision=revision)
     model.generation_config.language = "yo"
     model.generation_config.task = "transcribe"
     model.generation_config.forced_decoder_ids = None
@@ -150,6 +154,8 @@ def main():
                 "artifacts": fingerprint(args.out / "best"),
                 "validation_wer": trainer.state.best_metric,
                 "seed": args.seed,
+                "base_model": model_id,
+                "base_model_revision": revision,
                 "selection_metric": "validation WER; report TER jointly; test was not used",
                 "length_exclusions": exclusions,
                 "training_history": trainer.state.log_history,
