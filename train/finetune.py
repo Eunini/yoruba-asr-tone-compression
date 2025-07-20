@@ -119,6 +119,7 @@ def main():
         max_steps=args.steps,
         fp16=True,
         gradient_checkpointing=True,
+        gradient_checkpointing_kwargs={"use_reentrant": False},
         eval_strategy="steps",
         eval_steps=100,
         save_strategy="steps",

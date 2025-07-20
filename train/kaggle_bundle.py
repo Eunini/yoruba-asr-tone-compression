@@ -57,7 +57,11 @@ output.mkdir(exist_ok=True)
 shutil.copy('data/prepared/audit.json', output / 'data-audit.json')
 jobs = []
 def run_job(name, command):
-    status = subprocess.run(command).returncode
+    environment = os.environ.copy()
+    # Single-GPU Trainer avoids DataParallel/checkpoint graph reuse on the
+    # current Kaggle Torch build. Effective batch: 4 x accumulation 4 = 16.
+    environment['CUDA_VISIBLE_DEVICES'] = '0'
+    status = subprocess.run(command, env=environment).returncode
     jobs.append({'job':name, 'return_code':status})
     (output/'job-status.json').write_text(json.dumps(jobs,indent=2))
     return status == 0
