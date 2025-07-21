@@ -13,6 +13,7 @@ dependencies = ["jiwer>=4,<5", "datasets>=3.6,<4", "huggingface-hub>=0.34,<1", "
 inference = ["faster-whisper>=1.2,<2", "av>=13,<16", "httpx>=0.28,<1"]
 training = ["torch>=2.5,<3", "transformers>=4.45,<5", "accelerate>=1,<2", "librosa>=0.10,<1", "evaluate>=0.4,<1"]
 report = ["reportlab>=4,<5"]
+operator = ["kaggle>=2.2.5,<3"]
 dev = ["pytest>=8,<9", "ruff>=0.12,<1"]
 
 [tool.setuptools.packages.find]

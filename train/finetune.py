@@ -2,6 +2,7 @@
 
 import argparse
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -34,6 +35,7 @@ class Collator:
 
 
 def main():
+    os.environ.setdefault("CUDA_VISIBLE_DEVICES", "0")
     import torch
     from datasets import Audio, Dataset
     from transformers import (
