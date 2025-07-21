@@ -12,6 +12,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--owner", required=True, help="Kaggle username, not a token")
     p.add_argument("--out", type=Path, required=True, help="Bundle directory outside git")
+    p.add_argument("--skip-baselines", action="store_true", help="Retain a separately running baseline stage; train and test only")
     a = p.parse_args()
     dataset = a.out / "dataset"
     kernel = a.out / "kernel"
@@ -73,15 +74,17 @@ for size in ['tiny', 'base', 'small']:
         run_job('test-'+size, [sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
                     '--backend', 'whisper', '--model', str(destination / 'best'),
                     '--device', 'cuda', '--out', str(destination / 'test-float')])
-for backend, model in [('whisper', 'openai/whisper-small'), ('mms', 'facebook/mms-1b-all')]:
-    run_job('baseline-'+backend, [sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
-                    '--backend', backend, '--model', model, '--device', 'cuda',
-                    '--out', str(output / ('baseline-' + backend))])
+if __RUN_BASELINES__:
+    for backend, model in [('whisper', 'openai/whisper-small'), ('mms', 'facebook/mms-1b-all')]:
+        run_job('baseline-'+backend, [sys.executable, '-m', 'eval.run', '--manifest', 'data/prepared/test.jsonl',
+                        '--backend', backend, '--model', model, '--device', 'cuda',
+                        '--out', str(output / ('baseline-' + backend))])
 print('Selected models and GPU evaluations are in', output)
 print('Compression, controlled CPU costs, and native error review remain separate stages.')
 if any(job['return_code'] for job in jobs):
     raise RuntimeError('Some stages failed; job-status.json records them. Successful artifacts are retained.')
 """
+    study = study.replace("__RUN_BASELINES__", str(not a.skip_baselines))
     cells = [
         {
             "cell_type": "markdown",
