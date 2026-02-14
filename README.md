@@ -1,8 +1,8 @@
 # Do tones break first when a Yorùbá speech model shrinks?
 
-**Measured so far:** the complete WAXAL Yoruba data audit and a pretrained tiny
-CPU baseline. The training and compression study is still in progress; there is
-no supported claim yet that compression causes tone loss.
+**Preliminary result:** on all 177 held-out recordings, untuned MMS Yoruba achieved
+58.41% tone-stripped WER; Whisper-small achieved 143.66%. Fine-tuning and the
+compression/cost comparison remain in progress.
 
 WAXAL contains **`yor_tts`, not `yor_asr`** at the pinned revision. These are
 recordings collected for TTS and repurposed here for ASR. The 2026-10-25 audit
@@ -19,13 +19,19 @@ between training and test, and five between training and validation. Preparation
 removes held-out transcript duplicates from the training manifest. This experiment
 does **not** measure generalization to unseen speakers.
 
-| Model | Precision | Test recordings | WER | Conditional TER | Matched words | Local RTF | Cloud cost |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| faster-whisper-small | float32 | 177 | 110.76% | 100.00% | 1.01% | 0.710 | Not measured |
-| faster-whisper-tiny | float32 | 177 | 123.97% | 100.00% | 1.85% | 0.153 | Not measured |
-| faster-whisper-tiny | int8 | 177 | 122.16% | 100.00% | 2.57% | 0.063 | Not measured |
+| Baseline | Test recordings | Tone-stripped WER | Tone edits / all reference tones | Conditional TER | Matched words | Matched reference tones |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| openai/whisper-small | 177 | 143.66% | 0.37% | 88.89% | 0.80% | 0.41% |
+| facebook/mms-1b-all | 177 | 58.41% | 10.47% | 20.62% | 55.75% | 50.77% |
 
 ![Cost versus tone error](report/results/cost-tone.png)
+
+Both baselines above ran on a Kaggle T4 using the same pinned corpus and chunk policy.
+Whisper’s conditional TER has only 0.41% reference-tone coverage; read it with the
+coverage column. These are baseline measurements, not compression effects.
+The all-reference denominator requested in the study brief is included too;
+Whisper's small value reflects very few matching words and cannot establish
+better tone accuracy.
 
 The measurement table is in [the report](report/report.md); machine-readable
 observations are in [report/runs](report/runs). `null` costs mean no cloud price or
@@ -66,7 +72,7 @@ Checkpoints are selected by validation WER. Utterances longer than 30 seconds ar
 excluded as whole examples during training and validation checkpoint selection;
 the counts are saved. The complete test set remains intact. Each size has four
 conditions—float, int8, q5_0 and q4_0—so the complete matrix has **12 versions**.
-Record the exact source commits of both converter repositories. The converter also
+Use `bash scripts/build_whisper_cpp.sh /outside/repo/converter-source` to build the pinned converter/runtime sources. Record the exact source commits of both converter repositories. The converter also
 exports CT2 float32 and retains the whisper.cpp f16 file as controls. Compare
 quantized versions with the full-precision control from the same backend, since
 conversion and decoding can change results independently of quantization.

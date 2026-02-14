@@ -20,5 +20,5 @@ python "$cpp_dir/models/convert-h5-to-ggml.py" "$output_dir/hf-bin" "$whisper_di
 # Keep ggml-model.bin as the whisper.cpp f16 control. Attribute quantization
 # effects within a backend; HF, CT2 and whisper.cpp also differ in decoding.
 for quant in q5_0 q4_0; do
-  "$cpp_dir/build/bin/quantize" "$output_dir/ggml-model.bin" "$output_dir/ggml-model-$quant.bin" "$quant"
+  "$cpp_dir/build/bin/whisper-quantize" "$output_dir/ggml-model.bin" "$output_dir/ggml-model-$quant.bin" "$quant"
 done

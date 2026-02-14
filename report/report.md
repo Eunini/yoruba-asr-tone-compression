@@ -23,7 +23,10 @@ having some marks does not establish complete tone annotation.
 Use corpus WER after stripping acute and grave combining marks, retaining
 underdots. Align words using `jiwer`, then compare the tone-mark sequences in
 matching pairs using Levenshtein distance. Normalize TER by reference marks in
-those matching words and report coverage. Rates can exceed 100% through
+those matching words for the conditional score and report coverage. Also report
+the requested edit count divided by all reference marks. That second rate can
+fall when lexical accuracy collapses, because unmatched words contribute no
+tone comparisons. Rates can exceed 100% through
 insertions. Undefined denominators yield `null`.
 
 Select each fine-tuned checkpoint by held-out validation WER, never test scores.
@@ -34,16 +37,17 @@ q5_0 and q4_0 for tiny, base and small using documented backend policies.
 
 ## Preliminary results
 
-The generated table below is updated from completed `summary.json` files. These
-pretrained measurements are not fine-tuned model results. They cannot answer the
-compression question on their own.
+The two requested pretrained GPU baselines are complete on all 177 recordings.
+Source weight revisions and per-record predictions are saved with the run summaries.
+MMS has substantially greater lexical/tone coverage in this dataset. This is not
+a compression comparison; the fine-tuned matrix remains pending. Exploratory
+shared-host CTranslate2 CPU runs are retained separately in the results CSV.
 
 <!-- RESULTS -->
-| Model | Precision | Test recordings | WER | Conditional TER | Matched words | Local RTF | Cloud cost |
-| --- | --- | ---: | ---: | ---: | ---: | ---: | --- |
-| faster-whisper-small | float32 | 177 | 110.76% | 100.00% | 1.01% | 0.710 | Not measured |
-| faster-whisper-tiny | float32 | 177 | 123.97% | 100.00% | 1.85% | 0.153 | Not measured |
-| faster-whisper-tiny | int8 | 177 | 122.16% | 100.00% | 2.57% | 0.063 | Not measured |
+| Baseline | Test recordings | Tone-stripped WER | Tone edits / all reference tones | Conditional TER | Matched words | Matched reference tones |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| openai/whisper-small | 177 | 143.66% | 0.37% | 88.89% | 0.80% | 0.41% |
+| facebook/mms-1b-all | 177 | 58.41% | 10.47% | 20.62% | 55.75% | 50.77% |
 <!-- /RESULTS -->
 
 ## Cost chart
