@@ -1,0 +1,30 @@
+{
+  "scope": "compiled tools and CPU conversion imports; model conversion has not run yet",
+  "source_commits": {
+    "whisper.cpp": "231638a0717b7822784297e5980965ffcec05810",
+    "whisper": "86098128c0b4f24f0e2aa2994de830614b474227"
+  },
+  "packages": {
+    "torch": "2.11.0+cpu",
+    "transformers": "4.57.6",
+    "ctranslate2": "4.8.4",
+    "tokenizers": "0.22.2",
+    "safetensors": "0.8.0",
+    "numpy": "2.5.4"
+  },
+  "binary_checks": {
+    "whisper-cli": {
+      "exists": true,
+      "help_exit_code": 0
+    },
+    "whisper-server": {
+      "exists": true,
+      "help_exit_code": 0
+    },
+    "whisper-quantize": {
+      "exists": true,
+      "help_exit_code": 1,
+      "expected_usage_exit_code": 1
+    }
+  }
+}

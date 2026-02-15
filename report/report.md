@@ -35,6 +35,13 @@ rather than cropping audio against unmodified full labels. Report exclusion
 counts and retain a full-test long-audio evaluation. Evaluate float, int8,
 q5_0 and q4_0 for tiny, base and small using documented backend policies.
 
+Before inspecting compression results, the planned paired analysis also fixes
+lexical support: compare each quantized condition with its own backend's float
+control on reference-word positions correctly matched by both outputs. Report
+the remaining tone coverage as well as the full WER and both marginal tone
+scores. This separates tone changes on common words from changes in which words
+can be scored. The paired implementation and compression results remain pending.
+
 ## Preliminary results
 
 The two requested pretrained GPU baselines are complete on all 177 recordings.

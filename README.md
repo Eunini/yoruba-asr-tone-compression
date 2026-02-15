@@ -77,6 +77,14 @@ exports CT2 float32 and retains the whisper.cpp f16 file as controls. Compare
 quantized versions with the full-precision control from the same backend, since
 conversion and decoding can change results independently of quantization.
 
+The pinned tools have compiled and their CLI entry points have been checked;
+[toolchain evidence](report/conversion-toolchain.json) distinguishes this from
+actual model conversion. For CPU conversion, install
+`pip install -r requirements-conversion.txt` to use the recorded CPU PyTorch
+build. A submitted Kaggle job can be collected with `python -m train.collect_gpu
+--kernel OWNER/SLUG/VERSION --out /private/external/output`; collection starts
+no compute and keeps raw SDK logs outside the repository.
+
 ```bash
 /path/to/whisper-server -m models/tiny/ggml-model-q4_0.bin -t 4 --host 127.0.0.1 --port 8080
 # In a second terminal; server/model/thread settings must match:
