@@ -10,9 +10,11 @@ from pathlib import Path
 
 
 def kernel_state(response):
-    # Kaggle 2.2.5 returns JSON text; accept an object from other SDK versions too.
+    # The SDK returns a response object with an enum. Its JSON-looking __str__
+    # is only a display representation; also accept explicitly serialized forms.
     value = json.loads(response) if isinstance(response, str) else response
-    return str(value["status"]).upper()
+    status = value["status"] if isinstance(value, dict) else value.status
+    return str(getattr(status, "name", status)).upper()
 
 
 def main():
