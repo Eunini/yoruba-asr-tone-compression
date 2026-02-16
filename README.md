@@ -84,6 +84,10 @@ actual model conversion. For CPU conversion, install
 build. A submitted Kaggle job can be collected with `python -m train.collect_gpu
 --kernel OWNER/SLUG/VERSION --out /private/external/output`; collection starts
 no compute and keeps raw SDK logs outside the repository.
+`python -m train.convert_collected --help` describes the finite follow-on
+conversion step. It checks selected-weight fingerprints against complete test
+evaluations, then creates the CT2 and whisper.cpp conditions. Its output is
+labelled as awaiting inference validation; conversion alone is not a result.
 
 ```bash
 /path/to/whisper-server -m models/tiny/ggml-model-q4_0.bin -t 4 --host 127.0.0.1 --port 8080

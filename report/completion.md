@@ -8,7 +8,7 @@
 - Pending: Kaggle training
   for three sizes, checkpoint selection, all conversions, controlled cloud cost
   measurement, manual/native review of 50 outputs, and model publication.
-- Pending: a speaker-independent corpus such as FLEURS or YORÙLECT as a distinct
+- Future work: a speaker-independent corpus such as FLEURS or YORÙLECT as a distinct
   generalization test. Do not silently substitute it for the published WAXAL test.
 - Kaggle phone verification and GPU/internet access are resolved. The training
   protocol now uses one visible GPU with non-reentrant gradient checkpointing;

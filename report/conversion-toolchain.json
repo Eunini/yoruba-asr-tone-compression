@@ -1,5 +1,5 @@
 {
-  "scope": "compiled tools and CPU conversion imports; model conversion has not run yet",
+  "scope": "Compiled tools and CPU imports verified before model conversion",
   "source_commits": {
     "whisper.cpp": "231638a0717b7822784297e5980965ffcec05810",
     "whisper": "86098128c0b4f24f0e2aa2994de830614b474227"
@@ -26,5 +26,6 @@
       "help_exit_code": 1,
       "expected_usage_exit_code": 1
     }
-  }
+  },
+  "recorded_at": "2026-10-26T08:05:52.396252+00:00"
 }

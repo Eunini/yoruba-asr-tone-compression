@@ -87,7 +87,8 @@ remain necessary. No cloud cost or best fine-tuned model is claimed.
 
 ## Conclusion
 
-The data audit and metric implementation are complete. The final answer requires
+The data audit and metric implementation are complete. The within-corpus answer requires
 the full model matrix, GPU fine-tuning, controlled CPU serving measurements,
-native error review and a cross-domain evaluation. CV percentages remain blank
-until that evidence exists.
+and native error review. Cross-domain evaluation is future work before broader
+generalization claims. CV percentages remain blank until the required measured
+evidence exists.
