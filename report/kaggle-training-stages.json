@@ -1,0 +1,26 @@
+[
+  {
+    "job": "train-tiny",
+    "return_code": 0
+  },
+  {
+    "job": "test-tiny",
+    "return_code": 0
+  },
+  {
+    "job": "train-base",
+    "return_code": 0
+  },
+  {
+    "job": "test-base",
+    "return_code": 0
+  },
+  {
+    "job": "train-small",
+    "return_code": 0
+  },
+  {
+    "job": "test-small",
+    "return_code": 0
+  }
+]

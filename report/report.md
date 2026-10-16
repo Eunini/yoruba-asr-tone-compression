@@ -57,6 +57,43 @@ shared-host CTranslate2 CPU runs are retained separately in the results CSV.
 | facebook/mms-1b-all | 177 | 58.41% | 10.47% | 20.62% | 55.75% | 50.77% |
 <!-- /RESULTS -->
 
+The corrected Kaggle version 6 completed all training and evaluation stages
+(`report/kaggle-training-stages.json`, source `21314d2`). Each model trained for
+2,000 steps with fp16 on one visible T4. Removing held-out duplicate transcripts
+leaves 2,216 training recordings; the 30-second filter retains 1,691. Validation
+checkpoint selection uses 156 of 201 recordings. The full test is unchanged.
+
+| Fine-tuned model | Selected step | Validation WER | Full-test WER | Tone edits / all reference tones | Conditional TER | Matched reference tones |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| tiny | 800 | 61.08% | 88.76% | 10.20% | 37.17% | 27.45% |
+| base | 1,200 | 131.50% | 129.30% | 7.10% | 43.16% | 16.45% |
+| small | 1,100 | 66.79% | 111.61% | 10.88% | 33.47% | 32.50% |
+
+Tiny has the lowest validation WER and is the predeclared model-selection
+winner; MMS still has lower full-test WER than all three fine-tuned models.
+Base is particularly weak, with insertion-heavy outputs. This experiment does
+not demonstrate a successful accuracy improvement or a causal model-size trend.
+The recorded selections include training history and selected-weight hashes;
+test summaries carry matching fingerprints. Recomputing scores from saved
+predictions reproduces WER, TER and tone coverage.
+
+Post-hoc duration analysis identifies a distribution difference between filtered
+selection data and the full test. Of 177 test recordings, 133 are at most 30
+seconds and 44 are longer. Tiny's WER is 59.06% and 95.98%, respectively; MMS is
+48.43% and 60.84%. This is a descriptive diagnostic, not evidence that duration
+alone causes the gap. Neither removing long test clips nor selecting on this
+diagnostic is permitted. Reproduce the diagnostic with:
+
+```bash
+python -m eval.duration_report report/runs/hf-whisper-small-gpu \
+  report/runs/mms-yor-gpu report/runs/finetuned-{tiny,base,small}-gpu
+```
+
+The selected tiny/base/small checkpoints were converted to CT2 int8/float32 and
+whisper.cpp f16/q5_0/q4_0. Conversion receipts hash source and output artifacts.
+Converted-model inference, paired-support comparisons and controlled CPU costs
+remain outstanding; successful conversion alone supplies no compression result.
+
 ## Cost chart
 
 ![Cost versus tone error](results/cost-tone.png)
@@ -82,13 +119,14 @@ Speakers overlap across splits. References may omit marks. Conditional TER omits
 unmatched words and therefore must be read with WER and coverage. Tone sequences
 ignore mark position when two positions produce the same sequence, and unmarked
 mid tones are not scored. Tokenization, segmentation and decoding differences can
-confound backend comparisons. Full-model, quantized-model and cross-domain runs
-remain necessary. No cloud cost or best fine-tuned model is claimed.
+confound backend comparisons. Quantized-model and cross-domain runs remain
+necessary. Best here means lowest measured validation WER among these training
+runs; it does not mean a strong Yoruba recognizer. No cloud cost is claimed.
 
 ## Conclusion
 
 The data audit and metric implementation are complete. The within-corpus answer requires
-the full model matrix, GPU fine-tuning, controlled CPU serving measurements,
+the full model matrix, controlled CPU serving measurements,
 and native error review. Cross-domain evaluation is future work before broader
 generalization claims. CV percentages remain blank until the required measured
 evidence exists.

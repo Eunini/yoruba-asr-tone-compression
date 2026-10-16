@@ -1,8 +1,9 @@
 # Do tones break first when a Yorùbá speech model shrinks?
 
 **Preliminary result:** on all 177 held-out recordings, untuned MMS Yoruba achieved
-58.41% tone-stripped WER; Whisper-small achieved 143.66%. Fine-tuning and the
-compression/cost comparison remain in progress.
+58.41% tone-stripped WER. The fine-tuned Whisper checkpoint selected by the best
+validation WER was tiny, at 88.76% test WER. The compression/cost comparison
+remains pending; the fine-tuned models do not outperform this MMS baseline.
 
 WAXAL contains **`yor_tts`, not `yor_asr`** at the pinned revision. These are
 recordings collected for TTS and repurposed here for ASR. The 2026-10-25 audit
@@ -23,6 +24,20 @@ does **not** measure generalization to unseen speakers.
 | --- | ---: | ---: | ---: | ---: | ---: | ---: |
 | openai/whisper-small | 177 | 143.66% | 0.37% | 88.89% | 0.80% | 0.41% |
 | facebook/mms-1b-all | 177 | 58.41% | 10.47% | 20.62% | 55.75% | 50.77% |
+
+All three 2,000-step training runs and full-test evaluations completed on a
+single Kaggle T4. Checkpoints were selected independently by validation WER:
+
+| Fine-tuned size | Selected step | Validation WER | Test WER | Tone edits / all reference tones | Conditional TER | Matched reference tones |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| tiny | 800 | 61.08% | 88.76% | 10.20% | 37.17% | 27.45% |
+| base | 1,200 | 131.50% | 129.30% | 7.10% | 43.16% | 16.45% |
+| small | 1,100 | 66.79% | 111.61% | 10.88% | 33.47% | 32.50% |
+
+WER can exceed 100% through insertions. These are within-corpus float-model
+measurements, not quantization effects. Post-hoc duration diagnostics show tiny
+at 59.06% WER on 133 recordings up to 30 seconds and 95.98% on 44 longer ones.
+This diagnostic does not replace the full-test score or checkpoint selection.
 
 ![Cost versus tone error](report/results/cost-tone.png)
 
@@ -77,9 +92,10 @@ exports CT2 float32 and retains the whisper.cpp f16 file as controls. Compare
 quantized versions with the full-precision control from the same backend, since
 conversion and decoding can change results independently of quantization.
 
-The pinned tools have compiled and their CLI entry points have been checked;
-[toolchain evidence](report/conversion-toolchain.json) distinguishes this from
-actual model conversion. For CPU conversion, install
+All three selected checkpoints have been converted to CT2 int8/float32 and
+whisper.cpp f16/q5_0/q4_0. Converted-model inference and CPU cost validation
+remain pending. [Toolchain evidence](report/conversion-toolchain.json) records
+the pinned conversion tools. For CPU conversion, install
 `pip install -r requirements-conversion.txt` to use the recorded CPU PyTorch
 build. A submitted Kaggle job can be collected with `python -m train.collect_gpu
 --kernel OWNER/SLUG/VERSION --out /private/external/output`; collection starts

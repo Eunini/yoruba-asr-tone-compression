@@ -1,0 +1,327 @@
+{
+  "scope": "Post-hoc duration diagnostic; not checkpoint selection or a replacement for the full test",
+  "bins": {
+    "hf-whisper-small-gpu": {
+      "up_to_30s": {
+        "n": 133,
+        "audio_seconds": 1891.752,
+        "word_errors": 4386,
+        "reference_words": 1468,
+        "matched_words": 20,
+        "tone_edits": 8,
+        "reference_tones": 1946,
+        "matched_reference_tones": 10,
+        "wer": 2.9877384196185286,
+        "tone_error_rate": 0.8,
+        "reference_normalized_tone_edit_rate": 0.0041109969167523125,
+        "conditional_tone_error_rate": 0.8,
+        "matched_word_coverage": 0.013623978201634877,
+        "matched_tone_coverage": 0.0051387461459403904
+      },
+      "over_30s": {
+        "n": 44,
+        "audio_seconds": 3730.392,
+        "word_errors": 6406,
+        "reference_words": 6044,
+        "matched_words": 40,
+        "tone_edits": 24,
+        "reference_tones": 6815,
+        "matched_reference_tones": 26,
+        "wer": 1.0598941098610193,
+        "tone_error_rate": 0.9230769230769231,
+        "reference_normalized_tone_edit_rate": 0.0035216434336023477,
+        "conditional_tone_error_rate": 0.9230769230769231,
+        "matched_word_coverage": 0.0066181336863004635,
+        "matched_tone_coverage": 0.0038151137197358766
+      }
+    },
+    "mms-yor-gpu": {
+      "up_to_30s": {
+        "n": 133,
+        "audio_seconds": 1891.752,
+        "word_errors": 711,
+        "reference_words": 1468,
+        "matched_words": 831,
+        "tone_edits": 238,
+        "reference_tones": 1946,
+        "matched_reference_tones": 975,
+        "wer": 0.4843324250681199,
+        "tone_error_rate": 0.2441025641025641,
+        "reference_normalized_tone_edit_rate": 0.1223021582733813,
+        "conditional_tone_error_rate": 0.2441025641025641,
+        "matched_word_coverage": 0.5660762942779292,
+        "matched_tone_coverage": 0.501027749229188
+      },
+      "over_30s": {
+        "n": 44,
+        "audio_seconds": 3730.392,
+        "word_errors": 3677,
+        "reference_words": 6044,
+        "matched_words": 3357,
+        "tone_edits": 679,
+        "reference_tones": 6815,
+        "matched_reference_tones": 3473,
+        "wer": 0.6083719391131701,
+        "tone_error_rate": 0.19550820616181974,
+        "reference_normalized_tone_edit_rate": 0.09963316214233309,
+        "conditional_tone_error_rate": 0.19550820616181974,
+        "matched_word_coverage": 0.5554268696227663,
+        "matched_tone_coverage": 0.509611151870873
+      }
+    },
+    "finetuned-tiny-gpu": {
+      "up_to_30s": {
+        "n": 133,
+        "audio_seconds": 1891.752,
+        "word_errors": 867,
+        "reference_words": 1468,
+        "matched_words": 727,
+        "tone_edits": 215,
+        "reference_tones": 1946,
+        "matched_reference_tones": 880,
+        "wer": 0.590599455040872,
+        "tone_error_rate": 0.24431818181818182,
+        "reference_normalized_tone_edit_rate": 0.1104830421377184,
+        "conditional_tone_error_rate": 0.24431818181818182,
+        "matched_word_coverage": 0.4952316076294278,
+        "matched_tone_coverage": 0.4522096608427544
+      },
+      "over_30s": {
+        "n": 44,
+        "audio_seconds": 3730.392,
+        "word_errors": 5801,
+        "reference_words": 6044,
+        "matched_words": 1654,
+        "tone_edits": 679,
+        "reference_tones": 6815,
+        "matched_reference_tones": 1525,
+        "wer": 0.9597948378557247,
+        "tone_error_rate": 0.44524590163934424,
+        "reference_normalized_tone_edit_rate": 0.09963316214233309,
+        "conditional_tone_error_rate": 0.44524590163934424,
+        "matched_word_coverage": 0.27365982792852417,
+        "matched_tone_coverage": 0.22377109317681584
+      }
+    },
+    "finetuned-base-gpu": {
+      "up_to_30s": {
+        "n": 133,
+        "audio_seconds": 1891.752,
+        "word_errors": 2139,
+        "reference_words": 1468,
+        "matched_words": 554,
+        "tone_edits": 210,
+        "reference_tones": 1946,
+        "matched_reference_tones": 626,
+        "wer": 1.45708446866485,
+        "tone_error_rate": 0.3354632587859425,
+        "reference_normalized_tone_edit_rate": 0.1079136690647482,
+        "conditional_tone_error_rate": 0.3354632587859425,
+        "matched_word_coverage": 0.3773841961852861,
+        "matched_tone_coverage": 0.32168550873586843
+      },
+      "over_30s": {
+        "n": 44,
+        "audio_seconds": 3730.392,
+        "word_errors": 7574,
+        "reference_words": 6044,
+        "matched_words": 884,
+        "tone_edits": 412,
+        "reference_tones": 6815,
+        "matched_reference_tones": 815,
+        "wer": 1.2531436135009928,
+        "tone_error_rate": 0.505521472392638,
+        "reference_normalized_tone_edit_rate": 0.06045487894350697,
+        "conditional_tone_error_rate": 0.505521472392638,
+        "matched_word_coverage": 0.14626075446724024,
+        "matched_tone_coverage": 0.11958914159941306
+      }
+    },
+    "finetuned-small-gpu": {
+      "up_to_30s": {
+        "n": 133,
+        "audio_seconds": 1891.752,
+        "word_errors": 1308,
+        "reference_words": 1468,
+        "matched_words": 799,
+        "tone_edits": 220,
+        "reference_tones": 1946,
+        "matched_reference_tones": 933,
+        "wer": 0.8910081743869209,
+        "tone_error_rate": 0.2357984994640943,
+        "reference_normalized_tone_edit_rate": 0.1130524152106886,
+        "conditional_tone_error_rate": 0.2357984994640943,
+        "matched_word_coverage": 0.5442779291553134,
+        "matched_tone_coverage": 0.47944501541623846
+      },
+      "over_30s": {
+        "n": 44,
+        "audio_seconds": 3730.392,
+        "word_errors": 7076,
+        "reference_words": 6044,
+        "matched_words": 1918,
+        "tone_edits": 733,
+        "reference_tones": 6815,
+        "matched_reference_tones": 1914,
+        "wer": 1.170747849106552,
+        "tone_error_rate": 0.3829676071055381,
+        "reference_normalized_tone_edit_rate": 0.10755685986793836,
+        "conditional_tone_error_rate": 0.3829676071055381,
+        "matched_word_coverage": 0.3173395102581072,
+        "matched_tone_coverage": 0.28085106382978725
+      }
+    }
+  },
+  "training": {
+    "finetuned-tiny-gpu": {
+      "checkpoint": "/kaggle/working/research-artifacts/tiny/checkpoint-800",
+      "validation_wer": 0.6107848371596369,
+      "length_exclusions": {
+        "train": {
+          "original": 2216,
+          "retained": 1691,
+          "excluded_longer_than_30s": 525,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 1691
+        },
+        "validation": {
+          "original": 201,
+          "retained": 156,
+          "excluded_longer_than_30s": 45,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 156
+        }
+      },
+      "logged_training_steps": 25,
+      "first_training_entry": {
+        "eval_loss": 2.3403334617614746,
+        "eval_word_errors": 1780,
+        "eval_reference_words": 1873,
+        "eval_matched_words": 407,
+        "eval_tone_edits": 271,
+        "eval_reference_tones": 2421,
+        "eval_matched_reference_tones": 384,
+        "eval_wer": 0.9503470368392952,
+        "eval_tone_error_rate": 0.7057291666666666,
+        "eval_reference_normalized_tone_edit_rate": 0.11193721602643536,
+        "eval_conditional_tone_error_rate": 0.7057291666666666,
+        "eval_matched_word_coverage": 0.2172984516817939,
+        "eval_matched_tone_coverage": 0.15861214374225527,
+        "eval_runtime": 48.729,
+        "eval_samples_per_second": 3.201,
+        "eval_steps_per_second": 0.8,
+        "epoch": 0.9456264775413712,
+        "step": 100
+      },
+      "last_training_entry": {
+        "train_runtime": 5337.0353,
+        "train_samples_per_second": 5.996,
+        "train_steps_per_second": 0.375,
+        "total_flos": 7.855886241792e+17,
+        "train_loss": 0.6228436374664307,
+        "epoch": 18.86997635933806,
+        "step": 2000
+      }
+    },
+    "finetuned-base-gpu": {
+      "checkpoint": "/kaggle/working/research-artifacts/base/checkpoint-1200",
+      "validation_wer": 1.3150026695141483,
+      "length_exclusions": {
+        "train": {
+          "original": 2216,
+          "retained": 1691,
+          "excluded_longer_than_30s": 525,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 1691
+        },
+        "validation": {
+          "original": 201,
+          "retained": 156,
+          "excluded_longer_than_30s": 45,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 156
+        }
+      },
+      "logged_training_steps": 25,
+      "first_training_entry": {
+        "eval_loss": 1.8533023595809937,
+        "eval_word_errors": 5887,
+        "eval_reference_words": 1873,
+        "eval_matched_words": 328,
+        "eval_tone_edits": 235,
+        "eval_reference_tones": 2421,
+        "eval_matched_reference_tones": 328,
+        "eval_wer": 3.1430859583555795,
+        "eval_tone_error_rate": 0.7164634146341463,
+        "eval_reference_normalized_tone_edit_rate": 0.09706732755059892,
+        "eval_conditional_tone_error_rate": 0.7164634146341463,
+        "eval_matched_word_coverage": 0.17512012813667913,
+        "eval_matched_tone_coverage": 0.13548120611317638,
+        "eval_runtime": 142.2,
+        "eval_samples_per_second": 1.097,
+        "eval_steps_per_second": 0.274,
+        "epoch": 0.9456264775413712,
+        "step": 100
+      },
+      "last_training_entry": {
+        "train_runtime": 7154.1166,
+        "train_samples_per_second": 4.473,
+        "train_steps_per_second": 0.28,
+        "total_flos": 2.0696824774656e+18,
+        "train_loss": 0.47563162899017336,
+        "epoch": 18.86997635933806,
+        "step": 2000
+      }
+    },
+    "finetuned-small-gpu": {
+      "checkpoint": "/kaggle/working/research-artifacts/small/checkpoint-1100",
+      "validation_wer": 0.6679124399359316,
+      "length_exclusions": {
+        "train": {
+          "original": 2216,
+          "retained": 1691,
+          "excluded_longer_than_30s": 525,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 1691
+        },
+        "validation": {
+          "original": 201,
+          "retained": 156,
+          "excluded_longer_than_30s": 45,
+          "excluded_over_decoder_token_limit": 0,
+          "retained_after_all_filters": 156
+        }
+      },
+      "logged_training_steps": 25,
+      "first_training_entry": {
+        "eval_loss": 1.39022696018219,
+        "eval_word_errors": 3176,
+        "eval_reference_words": 1873,
+        "eval_matched_words": 523,
+        "eval_tone_edits": 291,
+        "eval_reference_tones": 2421,
+        "eval_matched_reference_tones": 533,
+        "eval_wer": 1.6956753870795516,
+        "eval_tone_error_rate": 0.5459662288930581,
+        "eval_reference_normalized_tone_edit_rate": 0.12019826517967781,
+        "eval_conditional_tone_error_rate": 0.5459662288930581,
+        "eval_matched_word_coverage": 0.2792311799252536,
+        "eval_matched_tone_coverage": 0.2201569599339116,
+        "eval_runtime": 176.684,
+        "eval_samples_per_second": 0.883,
+        "eval_steps_per_second": 0.221,
+        "epoch": 0.9456264775413712,
+        "step": 100
+      },
+      "last_training_entry": {
+        "train_runtime": 10982.8179,
+        "train_samples_per_second": 2.914,
+        "train_steps_per_second": 0.182,
+        "total_flos": 9.2087601242112e+18,
+        "train_loss": 0.29821748280525207,
+        "epoch": 18.86997635933806,
+        "step": 2000
+      }
+    }
+  }
+}
