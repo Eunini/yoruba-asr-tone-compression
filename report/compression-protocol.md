@@ -64,9 +64,17 @@ python -m serve.cloud_benchmark --account-id YOUR_INTENDED_ACCOUNT \
   --converted /external/verified/converted-v6 \
   --manifest data/prepared/test.jsonl --prices report/aws-public-prices.json \
   --terraform /absolute/path/to/terraform --max-hours 48 --budget-usd 6 \
-  --out report/runs/compression-aws
+  --out report/runs/compression-aws --publish-results
 ```
 
 These are execution methods. Only completed summaries establish measurements.
 Five-recording engineering checks in `conversion-validation.json` validate model
 loading and transcription; they are excluded from final scientific comparisons.
+
+After a complete matrix and verified teardown, the controller re-scores all
+predictions, recomputes paired tone statistics and serving costs, and produces
+the chart/table. Incomplete matrices or inconsistent scores cannot be finalized.
+`--publish-results` additionally commits only the owned run/results paths on
+`main`, checks the authenticated GitHub identity is Eunini, and pushes normally.
+Unrelated staged work is excluded. Without that flag, generated results stay
+local. Automatic publication does not claim the manual error review is complete.

@@ -20,9 +20,11 @@ def main():
     args.out.mkdir(parents=True, exist_ok=True)
     fields = [
         "model",
+        "label",
         "backend",
         "compute_type",
         "n",
+        "partial",
         "wer",
         "tone_error_rate",
         "reference_normalized_tone_edit_rate",
@@ -41,14 +43,29 @@ def main():
         writer = csv.DictWriter(stream, fields, extrasaction="ignore", lineterminator="\n")
         writer.writeheader()
         writer.writerows(rows)
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, 5.5))
     plotted = 0
     for row in rows:
         cost, ter = row.get("cost_per_audio_hour_usd"), row.get("tone_error_rate")
         if cost is None or ter is None:
             continue
-        ax.scatter(cost, ter * 100)
-        ax.annotate(f"{row['model']} ({row['compute_type']})", (cost, ter * 100), fontsize=8)
+        label = row.get("label") or f"{row['model']} ({row['compute_type']})"
+        size, _, precision = label.partition("-")
+        colors = {
+            "ct2-float32": "#64748b",
+            "ct2-int8": "#16836b",
+            "cpp-f16": "#4c78a8",
+            "cpp-q5_0": "#b77924",
+            "cpp-q4_0": "#a34561",
+        }
+        ax.scatter(
+            cost,
+            ter * 100,
+            label=label,
+            marker={"tiny": "o", "base": "s", "small": "^"}.get(size, "o"),
+            color=colors.get(precision),
+            s=48,
+        )
         plotted += 1
     if not plotted:
         ax.text(
@@ -61,9 +78,12 @@ def main():
         )
     ax.set(
         xlabel="USD per audio hour",
-        ylabel="Explicit tone error rate (%)",
+        ylabel="Conditional explicit-tone error rate (%)",
         title="Yorùbá ASR: measured cost and tone accuracy",
     )
+    if plotted:
+        ax.legend(loc="center left", bbox_to_anchor=(1, 0.5), fontsize=7, frameon=False)
+        ax.grid(alpha=0.15)
     fig.tight_layout()
     fig.savefig(args.out / "cost-tone.png", dpi=180)
 

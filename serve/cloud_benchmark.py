@@ -13,6 +13,7 @@ import re
 import shlex
 import signal
 import subprocess
+import sys
 import time
 import urllib.request
 from datetime import datetime, timezone
@@ -56,6 +57,11 @@ def main():
     p.add_argument("--max-hours", type=float, default=24)
     p.add_argument("--budget-usd", type=float, default=6)
     p.add_argument("--out", type=Path, required=True)
+    p.add_argument(
+        "--publish-results",
+        action="store_true",
+        help="After full completion and verified teardown, publish only this run's artifacts to Eunini/main",
+    )
     a = p.parse_args()
     repo = Path(__file__).resolve().parents[1]
     if not a.out.resolve().is_relative_to(repo / "report/runs"):
@@ -145,6 +151,7 @@ def main():
             }
         )
         write_json(a.out / "controller.json", receipt)
+
         if check and result.returncode:
             raise RuntimeError("Benchmark stage failed: " + name)
         return result.returncode
@@ -397,6 +404,21 @@ uname -a > /home/ubuntu/asr-results/kernel.txt
                 raise RuntimeError("Teardown not verified; inspect the exclusive benchmark state")
         receipt["finished_at"] = datetime.now(timezone.utc).isoformat()
         write_json(a.out / "controller.json", receipt)
+
+    if receipt.get("status") == "measurements_complete" and receipt.get("teardown_verified"):
+        command = [sys.executable, "-m", "eval.finalize", "--matrix", str(a.out)]
+        if a.publish_results:
+            command.append("--publish")
+        with (state / "finalize-measurements.log").open("a") as log:
+            subprocess.run(
+                command,
+                cwd=repo,
+                env=env,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+                check=True,
+                timeout=600,
+            )
 
 
 if __name__ == "__main__":

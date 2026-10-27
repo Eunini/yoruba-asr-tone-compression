@@ -176,6 +176,7 @@ def main():
     parser.add_argument("--manifest", type=Path, required=True)
     parser.add_argument("--backend", choices=["ct2", "whisper", "mms", "cpp"], required=True)
     parser.add_argument("--model", required=True)
+    parser.add_argument("--label", help="Short model/precision label for tables and charts")
     parser.add_argument(
         "--revision", help="Pinned public weights commit; known study models have defaults"
     )
@@ -222,6 +223,7 @@ def main():
             pass
     identity = {
         "model": args.model,
+        "label": args.label,
         "artifacts": artifacts,
         "revision": args.revision,
         "backend": args.backend,
@@ -288,6 +290,7 @@ def main():
         "status": "measured",
         "artifacts": artifacts,
         "model": args.model,
+        "label": args.label,
         "source_revision": args.revision,
         "backend": args.backend,
         "compute_type": args.compute_type if args.backend == "ct2" else "backend default",

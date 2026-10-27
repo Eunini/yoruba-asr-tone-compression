@@ -16,6 +16,8 @@ from pathlib import Path
 
 from eval.paired import compare
 
+TEST_EVALUATION_SHA256 = "2e71d67cf2d5de5c1953bc646ca1550887b31de11f2b6370e82beacaf9cc8529"
+
 
 def digest(path):
     with path.open("rb") as stream:
@@ -62,6 +64,15 @@ def main():
     rows = [json.loads(line) for line in a.manifest.read_text().splitlines()]
     if len(rows) != 177 or len({r["id"] for r in rows}) != 177:
         raise ValueError("Use all 177 distinct held-out WAXAL recordings")
+    canonical = hashlib.sha256(
+        json.dumps(
+            [{key: row[key] for key in ("id", "reference", "duration_seconds")} for row in rows],
+            ensure_ascii=False,
+            sort_keys=True,
+        ).encode()
+    ).hexdigest()
+    if canonical != TEST_EVALUATION_SHA256:
+        raise ValueError("Test content or order differs from the audited corpus")
     if any(not Path(r["audio"]).is_file() for r in rows):
         raise ValueError("Manifest audio is missing")
     a.out.mkdir(parents=True, exist_ok=True)
@@ -132,6 +143,8 @@ def main():
                     backend,
                     "--model",
                     str(artifact),
+                    "--label",
+                    name,
                     "--compute-type",
                     precision,
                     "--threads",
