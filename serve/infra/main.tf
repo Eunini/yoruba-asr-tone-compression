@@ -109,7 +109,10 @@ resource "aws_instance" "cpu" {
     bootcmd:
       - [systemd-run, --unit=afri-benchmark-expiry, --on-active=${ceil(var.max_hours * 3600)}s, /usr/sbin/shutdown, -h, now]
     package_update: true
-    packages: [git, cmake, build-essential, python3-venv, libsndfile1, libgomp1, rsync, ca-certificates]
+    packages: [git, cmake, build-essential, python3-venv, libsndfile1, libgomp1, rsync, ca-certificates, openssh-server, iptables]
+    runcmd:
+      - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '22', -j, ACCEPT]
+      - [systemctl, enable, --now, ssh.service]
   CLOUD
   root_block_device {
     volume_type           = "gp3"

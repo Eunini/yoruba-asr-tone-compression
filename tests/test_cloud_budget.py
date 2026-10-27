@@ -39,6 +39,8 @@ def test_fresh_backend_is_empty_but_existing_resources_or_corruption_block_reuse
     assert state_is_empty(state)
     state.write_text('{"resources": []}')
     assert state_is_empty(state)
+    state.write_text('{"resources": [{"mode": "data", "type": "aws_ami"}]}')
+    assert state_is_empty(state)
     state.write_text('{"resources": [{"type": "aws_instance"}]}')
     assert not state_is_empty(state)
     state.write_text('incomplete')

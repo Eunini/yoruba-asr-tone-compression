@@ -14,8 +14,6 @@ import time
 from datetime import datetime, timezone
 from pathlib import Path
 
-import httpx
-
 from eval.paired import compare
 
 
@@ -40,6 +38,8 @@ def verify_conversion(root):
 
 
 def main():
+    import httpx
+
     p = argparse.ArgumentParser()
     p.add_argument("--converted", type=Path, required=True)
     p.add_argument("--manifest", type=Path, required=True)

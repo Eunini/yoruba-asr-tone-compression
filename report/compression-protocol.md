@@ -52,6 +52,9 @@ destroys its exclusive Terraform state in a finally block on success or failure.
 Root disks delete on termination. Preserve the controller's actual teardown
 receipt; do not claim cleanup merely because a timer was configured. State,
 provisioning logs, SSH host keys and local account files remain outside git.
+If supervised with systemd, use `KillMode=mixed` and a cleanup grace period:
+SIGTERM must reach the Python controller first so its Terraform cleanup process
+can finish. Sending SIGTERM to the entire cgroup can interrupt teardown itself.
 
 ```bash
 # Refresh Project 3's unauthenticated AWS offer-file price snapshot first.

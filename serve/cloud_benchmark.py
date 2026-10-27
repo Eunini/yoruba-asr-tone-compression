@@ -35,7 +35,10 @@ def preflight_price(prices, max_hours, budget):
 def state_is_empty(path):
     path = Path(path)
     # Terraform's first init has no state yet; `terraform state list` then exits 1.
-    return not path.exists() or not json.loads(path.read_text()).get("resources", [])
+    return not path.exists() or not any(
+        r.get("mode", "managed") == "managed"
+        for r in json.loads(path.read_text()).get("resources", [])
+    )
 
 
 def main():
@@ -230,7 +233,7 @@ def main():
         ][0]
         receipt["launch_time"] = instance["LaunchTime"].isoformat()
         receipt["volume_ids"] = [v["Ebs"]["VolumeId"] for v in instance["BlockDeviceMappings"]]
-        for _ in range(60):
+        for _ in range(120):
             if remote("true", timeout=15, check=False) == 0:
                 break
             time.sleep(5)
