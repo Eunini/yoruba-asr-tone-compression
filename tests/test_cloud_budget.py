@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from serve.cloud_benchmark import preflight_price
+from serve.cloud_benchmark import preflight_price, state_is_empty
 
 
 def price(age_hours=0, hourly=0.10404767123287671):
@@ -32,3 +32,15 @@ def test_stale_or_wrong_region_price_cannot_start_compute():
     wrong["region"] = "eu-west-1"
     with pytest.raises(ValueError, match="Refresh"):
         preflight_price(wrong, 24, 6)
+
+
+def test_fresh_backend_is_empty_but_existing_resources_or_corruption_block_reuse(tmp_path):
+    state = tmp_path / "terraform.tfstate"
+    assert state_is_empty(state)
+    state.write_text('{"resources": []}')
+    assert state_is_empty(state)
+    state.write_text('{"resources": [{"type": "aws_instance"}]}')
+    assert not state_is_empty(state)
+    state.write_text('incomplete')
+    with pytest.raises(ValueError):
+        state_is_empty(state)

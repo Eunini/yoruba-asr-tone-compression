@@ -32,6 +32,12 @@ def preflight_price(prices, max_hours, budget):
     return hourly
 
 
+def state_is_empty(path):
+    path = Path(path)
+    # Terraform's first init has no state yet; `terraform state list` then exits 1.
+    return not path.exists() or not json.loads(path.read_text()).get("resources", [])
+
+
 def main():
     import boto3
 
@@ -187,7 +193,7 @@ def main():
         if a.plugin_dir:
             init += ["-plugin-dir=" + str(a.plugin_dir.resolve())]
         run("terraform-init", init)
-        if subprocess.check_output(tf + ["state", "list"], env=env, cwd=repo, text=True).strip():
+        if not state_is_empty(state / "terraform.tfstate"):
             raise ValueError("Dedicated benchmark state is not empty; inspect the previous run")
         request = urllib.request.Request(
             "https://checkip.amazonaws.com", headers={"User-Agent": "afri-asr-research"}
@@ -368,9 +374,7 @@ uname -a > /home/ubuntu/asr-results/kernel.txt
                 check=False,
             )
             receipt["terraform_destroy_exit_code"] = code
-            empty = not subprocess.check_output(
-                tf + ["state", "list"], cwd=repo, env=env, text=True
-            ).strip()
+            empty = state_is_empty(state / "terraform.tfstate")
             receipt["terraform_state_empty"] = empty
             if expected_instance:
                 instances = session.client("ec2").describe_instances(
