@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ReadResearchInstanceBootLogsOnly",
+      "Effect": "Allow",
+      "Action": "ec2:GetConsoleOutput",
+      "Resource": "arn:aws:ec2:us-east-1:*:instance/*",
+      "Condition": {
+        "StringEquals": {
+          "aws:RequestedRegion": "us-east-1",
+          "aws:ResourceTag/Project": [
+            "afri-asr-compression",
+            "afri-ai-research"
+          ]
+        }
+      }
+    }
+  ]
+}
