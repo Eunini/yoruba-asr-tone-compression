@@ -1,4 +1,4 @@
-# Do tones break first when a Yorùbá speech model shrinks?
+# Yorùbá ASR compression and tone retention
 
 **Preliminary result:** on all 177 held-out recordings, untuned MMS Yoruba achieved
 58.41% tone-stripped WER. The fine-tuned Whisper checkpoint selected by the best
@@ -44,7 +44,7 @@ This diagnostic does not replace the full-test score or checkpoint selection.
 Both baselines above ran on a Kaggle T4 using the same pinned corpus and chunk policy.
 Whisper’s conditional TER has only 0.41% reference-tone coverage; read it with the
 coverage column. These are baseline measurements, not compression effects.
-The all-reference denominator requested in the study brief is included too;
+The table also includes an all-reference denominator;
 Whisper's small value reflects very few matching words and cannot establish
 better tone accuracy.
 
