@@ -8,12 +8,16 @@ import contextlib
 import subprocess
 import tempfile
 import time
+import os
+import importlib.metadata
+import fcntl
 from datetime import datetime, timezone
 from pathlib import Path
 
 from eval.metrics import score
 from eval.artifacts import fingerprint
 from eval.audio import chunks
+from eval.journal import prepare
 from train.model_revisions import REVISIONS
 
 
@@ -185,6 +189,9 @@ def main():
     )
     parser.add_argument("--limit", type=int)
     parser.add_argument("--out", type=Path, required=True)
+    parser.add_argument(
+        "--resume", action="store_true", help="Resume only an identical recorded run"
+    )
     parser.add_argument("--server-hourly-usd", type=float)
     parser.add_argument("--price-source")
     args = parser.parse_args()
@@ -200,17 +207,67 @@ def main():
         rows = rows[: args.limit]
     if not rows:
         parser.error("Manifest is empty")
+    artifacts = fingerprint(args.model)
+    source_files = [
+        Path(__file__),
+        Path(__file__).with_name("metrics.py"),
+        Path(__file__).with_name("audio.py"),
+        Path(__file__).with_name("journal.py"),
+    ]
+    versions = {}
+    for package in ("jiwer", "faster-whisper", "ctranslate2", "transformers", "torch", "httpx"):
+        try:
+            versions[package] = importlib.metadata.version(package)
+        except importlib.metadata.PackageNotFoundError:
+            pass
+    identity = {
+        "model": args.model,
+        "artifacts": artifacts,
+        "revision": args.revision,
+        "backend": args.backend,
+        "device": args.device,
+        "compute_type": args.compute_type,
+        "threads": args.threads,
+        "cpp_server_url": args.cpp_server_url,
+        "manifest_sha256": hashlib.sha256(args.manifest.read_bytes()).hexdigest(),
+        "limit": args.limit,
+        "server_hourly_usd": args.server_hourly_usd,
+        "price_source": args.price_source,
+        "platform": platform.platform(),
+        "packages": versions,
+        "source_sha256": {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in source_files},
+    }
+    identity["audio_sha256"] = {}
+    for row in rows:
+        with open(row["audio"], "rb") as stream:
+            identity["audio_sha256"][row["id"]] = hashlib.file_digest(stream, "sha256").hexdigest()
+    args.out.mkdir(parents=True, exist_ok=True)
+    run_lock = (args.out / ".run.lock").open("a")
+    fcntl.flock(run_lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+    predictions = prepare(args.out, identity, rows, args.resume)
+    if len(predictions) == len(rows) and (args.out / "summary.json").exists():
+        print("Identical completed run already saved; no inference repeated")
+        return
     start = time.perf_counter()
     transcribe = backend(args)
     load_seconds = time.perf_counter() - start
-    transcribe(rows[0]["audio"])  # Fixed warmup excluded from steady-state timing.
-    args.out.mkdir(parents=True, exist_ok=True)
-    predictions = []
     with contextlib.ExitStack() as stack:
         if hasattr(transcribe, "close"):
             stack.callback(transcribe.close)
-        stream = stack.enter_context((args.out / "predictions.jsonl").open("w"))
-        for row in rows:
+        transcribe(rows[0]["audio"])  # Same fixed warmup after every model load.
+        with (args.out / "load-events.jsonl").open("a") as events:
+            events.write(
+                json.dumps(
+                    {
+                        "timestamp": datetime.now(timezone.utc).isoformat(),
+                        "load_seconds": load_seconds,
+                        "existing_predictions": len(predictions),
+                    }
+                )
+                + "\n"
+            )
+        stream = stack.enter_context((args.out / "predictions.jsonl").open("a"))
+        for row in rows[len(predictions) :]:
             start = time.perf_counter()
             hypothesis = transcribe(row["audio"])
             predictions.append(
@@ -224,11 +281,12 @@ def main():
             )
             stream.write(json.dumps(predictions[-1], ensure_ascii=False) + "\n")
             stream.flush()
+            os.fsync(stream.fileno())
     seconds = sum(r["processing_seconds"] for r in predictions)
     duration = sum(r["duration_seconds"] for r in predictions)
     result = {
         "status": "measured",
-        "artifacts": fingerprint(args.model),
+        "artifacts": artifacts,
         "model": args.model,
         "source_revision": args.revision,
         "backend": args.backend,
@@ -240,6 +298,12 @@ def main():
         "n": len(rows),
         "partial": args.limit is not None,
         "load_seconds": load_seconds,
+        "load_timing_scope": (
+            "HTTP client initialization; persistent whisper.cpp model was loaded before this run"
+            if args.backend == "cpp" and args.cpp_server_url
+            else "backend initialization and model loading"
+        ),
+        "load_events_file": "load-events.jsonl",
         "timing_scope": (
             "process startup and model load per utterance; not steady-state"
             if args.backend == "cpp" and not args.cpp_server_url
@@ -272,7 +336,9 @@ def main():
         "price_source": args.price_source,
         **score([r["reference"] for r in predictions], [r["hypothesis"] for r in predictions]),
     }
-    (args.out / "summary.json").write_text(json.dumps(result, indent=2) + "\n")
+    temporary = args.out / "summary.json.tmp"
+    temporary.write_text(json.dumps(result, indent=2) + "\n")
+    temporary.replace(args.out / "summary.json")
     print(json.dumps(result, indent=2))
 
 

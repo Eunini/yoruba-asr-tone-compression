@@ -1,0 +1,33 @@
+{
+  "scope": "Five-recording engineering checks only; no compression or cost conclusion",
+  "checks": [
+    {
+      "label": "finetuned-tiny-ct2-int8-validation",
+      "status": "passed real-audio inference validation",
+      "n": 5,
+      "partial": true,
+      "backend": "ct2",
+      "artifacts": {
+        "config.json": "a73a28cdfe1c43ccc7202fa333d1f89c202477271407ae9a7f19afa52039cac8",
+        "model.bin": "c84765e8164efb0e6062455f4e10d558dd5953e72015e79799634503c1903586",
+        "preprocessor_config.json": "994838f1fa6462c8b9b3c90edada831f11f3dd8b4664634e18f4694d005c9dbf",
+        "tokenizer.json": "7b469ff15eb7816315aa45eec391f5943d639b9d73d110f5c003df5192fd54e3",
+        "vocabulary.json": "5ad28279db5e546349708b9a74736e2c018737ac5a600f1048f1f26c99b85b47"
+      },
+      "evaluation_set_sha256": "f92316a5eb34553488d7fa43c0e5ee238a682287a1d88c1f234094979d95c17c",
+      "timestamp": "2026-10-27T22:28:45.050399+00:00"
+    },
+    {
+      "label": "finetuned-tiny-cpp-q4-validation",
+      "status": "passed real-audio inference validation",
+      "n": 5,
+      "partial": true,
+      "backend": "cpp",
+      "artifacts": {
+        "ggml-model-q4_0.bin": "f2df3cbae25ff8036af73b1218c435a6f4803cea2b6afed1167a079bfb96062c"
+      },
+      "evaluation_set_sha256": "f92316a5eb34553488d7fa43c0e5ee238a682287a1d88c1f234094979d95c17c",
+      "timestamp": "2026-10-27T22:34:22.870071+00:00"
+    }
+  ]
+}

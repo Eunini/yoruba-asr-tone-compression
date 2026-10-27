@@ -11,6 +11,11 @@
 - Pending: converted-model inference validation and scoring, paired common-word
   tone analysis, controlled CPU cost measurement, manual/native review of 50
   outputs, final chart/report and model publication.
+- Update: CT2 int8 and whisper.cpp q4 tiny passed five-recording real-audio
+  engineering checks. The resumable 15-condition CPU runner and paired-support
+  analysis are implemented and tested; full CPU results remain pending. The
+  dedicated AWS controller includes price/runtime guards, periodic result sync,
+  a verified termination timer and Terraform teardown. See compression-protocol.md.
 - Future work: a speaker-independent corpus such as FLEURS or YORÙLECT as a distinct
   generalization test. Do not silently substitute it for the published WAXAL test.
 - Kaggle phone verification and GPU/internet access are resolved. The training

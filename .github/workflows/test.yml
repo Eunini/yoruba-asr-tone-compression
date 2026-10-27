@@ -15,3 +15,7 @@ jobs:
       - run: pip install -r requirements-dev.lock && pip install --no-deps -e .
       - run: ruff check .
       - run: pytest -q
+      - uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.13.4'
+      - run: terraform -chdir=serve/infra fmt -check && terraform -chdir=serve/infra init -backend=false && terraform -chdir=serve/infra validate

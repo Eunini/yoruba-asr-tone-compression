@@ -5,6 +5,11 @@
 validation WER was tiny, at 88.76% test WER. The compression/cost comparison
 remains pending; the fine-tuned models do not outperform this MMS baseline.
 
+The [converted-model CPU protocol](report/compression-protocol.md) documents the
+15-condition resumable matrix, fixed lexical-support tone comparisons, and
+bounded AWS cost experiment. Tiny int8 and q4 artifacts passed initial real-audio
+engineering checks; those five-recording checks are not final research results.
+
 WAXAL contains **`yor_tts`, not `yor_asr`** at the pinned revision. These are
 recordings collected for TTS and repurposed here for ASR. The 2026-10-25 audit
 decoded every recording with the `datasets` library:

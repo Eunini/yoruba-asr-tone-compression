@@ -25,3 +25,8 @@ runs/private/
 *.safetensors
 *.wav
 *.mp3
+**/.run.lock
+**/.matrix.lock
+report/runs/*-validation/
+report/runs/compression-*/**/*.log
+report/runs/compression-*/progress.json
