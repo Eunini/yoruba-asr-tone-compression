@@ -35,7 +35,9 @@ repeatability or population-wide Yoruba performance.
 
 `serve/infra` creates one private-profile EC2 `m7i-flex.large` in us-east-1,
 with 30 GB encrypted gp3, one public IPv4, IMDSv2, and SSH restricted to the
-controller's /32. Models and audio are transferred over SSH; no AWS, Hugging Face
+controller's /32 on ports 22 and 443. The controller defaults to SSH port 443
+for environments where outbound port 22 is unavailable. Models and audio are
+transferred over SSH; no AWS, Hugging Face
 or API credentials are sent to the machine. There is no public inference endpoint.
 
 The controller accepts freshly checked public AWS list prices, a positive runtime

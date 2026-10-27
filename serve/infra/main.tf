@@ -79,11 +79,14 @@ resource "aws_route_table_association" "main" {
 resource "aws_security_group" "node" {
   name_prefix = "afri-asr-"
   vpc_id      = aws_vpc.main.id
-  ingress {
-    from_port   = 22
-    to_port     = 22
-    protocol    = "tcp"
-    cidr_blocks = [var.admin_cidr]
+  dynamic "ingress" {
+    for_each = toset([22, 443])
+    content {
+      from_port   = ingress.value
+      to_port     = ingress.value
+      protocol    = "tcp"
+      cidr_blocks = [var.admin_cidr]
+    }
   }
   egress {
     from_port   = 0
@@ -106,12 +109,21 @@ resource "aws_instance" "cpu" {
   user_data_replace_on_change          = true
   user_data                            = <<-CLOUD
     #cloud-config
+    write_files:
+      - path: /etc/ssh/sshd_config.d/afri-research-ports.conf
+        permissions: '0644'
+        content: |
+          Port 22
+          Port 443
     bootcmd:
       - [systemd-run, --unit=afri-benchmark-expiry, --on-active=${ceil(var.max_hours * 3600)}s, /usr/sbin/shutdown, -h, now]
     package_update: true
     packages: [git, cmake, build-essential, python3-venv, libsndfile1, libgomp1, rsync, ca-certificates, openssh-server, iptables]
     runcmd:
       - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '22', -j, ACCEPT]
+      - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '443', -j, ACCEPT]
+      - [systemctl, disable, --now, ssh.socket]
+      - [systemctl, daemon-reload]
       - [systemctl, enable, --now, ssh.service]
   CLOUD
   root_block_device {

@@ -52,6 +52,7 @@ def main():
     p.add_argument("--terraform", type=Path, required=True)
     p.add_argument("--plugin-dir", type=Path)
     p.add_argument("--ssh-key", type=Path, default=Path.home() / ".ssh/afri-ai")
+    p.add_argument("--ssh-port", type=int, choices=[22, 443], default=443)
     p.add_argument("--max-hours", type=float, default=24)
     p.add_argument("--budget-usd", type=float, default=6)
     p.add_argument("--out", type=Path, required=True)
@@ -156,6 +157,8 @@ def main():
 
     ssh = [
         "ssh",
+        "-p",
+        str(a.ssh_port),
         "-i",
         str(a.ssh_key),
         "-o",
