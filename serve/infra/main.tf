@@ -116,7 +116,8 @@ resource "aws_instance" "cpu" {
           Port 22
           Port 443
     bootcmd:
-      - [systemd-run, --unit=afri-benchmark-expiry, --on-active=${ceil(var.max_hours * 3600)}s, /usr/sbin/shutdown, -h, now]
+      - [systemd-run, --no-block, --unit=afri-benchmark-expiry, --on-active=${ceil(var.max_hours * 3600)}s, /usr/sbin/shutdown, -h, now]
+      - [sh, -c, "printf 'AFRI benchmark expiry timer queued\\n' > /dev/ttyS0"]
     package_update: true
     packages: [git, cmake, build-essential, python3-venv, libsndfile1, libgomp1, rsync, ca-certificates, openssh-server, iptables]
     runcmd:
@@ -124,7 +125,8 @@ resource "aws_instance" "cpu" {
       - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '443', -j, ACCEPT]
       - [systemctl, disable, --now, ssh.socket]
       - [systemctl, daemon-reload]
-      - [systemctl, enable, --now, ssh.service]
+      - [systemctl, enable, ssh.service]
+      - [systemctl, restart, ssh.service]
   CLOUD
   root_block_device {
     volume_type           = "gp3"
