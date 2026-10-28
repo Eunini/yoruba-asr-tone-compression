@@ -1,0 +1,25 @@
+{
+  "checked_at": "2026-10-28",
+  "dataset_card": "https://huggingface.co/datasets/google/WaxalNLP/blob/5f4d8ca24f2b9d168b2ee545f1febaaff4b40580/README.md",
+  "dataset_subset": "Media Trust Yoruba TTS; CC-BY-SA-4.0",
+  "base_card": "https://huggingface.co/openai/whisper-tiny/blob/169d4a4341b33bc18d8881c4b69c2e104e1cc0af/README.md",
+  "base_card_license": "apache-2.0",
+  "adaptation_license": "cc-by-sa-4.0",
+  "retained_licenses": {
+    "LICENSE": {
+      "url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode.txt",
+      "sha256": "28a9529c7d0bb4dc51f4bf5c116a3d16ef247a052f7591466768ddf563fd1cf5",
+      "bytes": 20138
+    },
+    "LICENSE-BASE-APACHE-2.0.txt": {
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.txt",
+      "sha256": "cfc7749b96f63bd31c3c42b5c471bf756814053e847c10f3eb003417bc523d30",
+      "bytes": 11358
+    },
+    "LICENSE-UPSTREAM-WHISPER-MIT.txt": {
+      "url": "https://raw.githubusercontent.com/openai/whisper/86098128c0b4f24f0e2aa2994de830614b474227/LICENSE",
+      "sha256": "b5d65a59060e68c4ff940e1eddfa6f94b2d68fdf58ed7f4dd57721c997e35e9d",
+      "bytes": 1063
+    }
+  }
+}
