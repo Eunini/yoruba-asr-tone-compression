@@ -168,6 +168,7 @@ def main():
                             raise TimeoutError("Finite matrix runtime reached")
                         if backend == "cpp":
                             with socket.socket() as port_check:
+                                port_check.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
                                 port_check.bind(("127.0.0.1", a.port))
                             server_command = [
                                 str(a.cpp_server),
