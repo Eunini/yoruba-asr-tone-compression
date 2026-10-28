@@ -1,0 +1,19 @@
+{
+  "checked_at": "2026-10-28T00:56:42.945528+00:00",
+  "status": "passed",
+  "repo_id": "Ineeoluwa/whisper-tiny-yoruba-waxal-research",
+  "revision": "2be42141c256433043343784c0b055656004ac9b",
+  "anonymous_weight_download_and_sha256_verified": true,
+  "model_safetensors_sha256": "880795cd4a860271f9a219330b28b6916313b3e11cb19a28ac88cafe152c6f13",
+  "device": "cpu",
+  "inference_threads": 1,
+  "audio_id": "yor_1374",
+  "audio_seconds": 5.76,
+  "transcription_nonempty": true,
+  "transcription_sha256": "2477b66564150631d9bc65e54b2233bbc5c99a05abbb4e4a2261295ed3160238",
+  "scope": "Single real-audio loading/inference smoke check from public Hub weights; not a new accuracy or latency benchmark",
+  "packages": {
+    "torch": "2.11.0+cpu",
+    "transformers": "4.57.6"
+  }
+}

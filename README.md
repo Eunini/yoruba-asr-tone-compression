@@ -5,6 +5,13 @@
 validation WER was tiny, at 88.76% test WER. The compression/cost comparison
 remains pending; the fine-tuned models do not outperform this MMS baseline.
 
+The selected research checkpoint is public on Hugging Face:
+[Ineeoluwa/whisper-tiny-yoruba-waxal-research](https://huggingface.co/Ineeoluwa/whisper-tiny-yoruba-waxal-research).
+Its card includes measured errors, coverage, data/selection limitations and
+retained licenses. Anonymous download, weight SHA256 and one real-audio CPU
+transcription were verified. This is a reproducible research release, with the
+complete compression study still pending; see [publication evidence](report/model-release/publication.json).
+
 The [converted-model CPU protocol](report/compression-protocol.md) documents the
 15-condition resumable matrix, fixed lexical-support tone comparisons, and
 bounded AWS cost experiment. Tiny int8 and q4 artifacts passed initial real-audio
@@ -90,16 +97,17 @@ done
 
 Checkpoints are selected by validation WER. Utterances longer than 30 seconds are
 excluded as whole examples during training and validation checkpoint selection;
-the counts are saved. The complete test set remains intact. Each size has four
-conditions—float, int8, q5_0 and q4_0—so the complete matrix has **12 versions**.
+the counts are saved. The complete test set remains intact. Each size has five
+backend conditions: CT2 float32/int8 and whisper.cpp f16/q5_0/q4_0, for **15
+conditions** in total. Both backends retain their own float control.
 Use `bash scripts/build_whisper_cpp.sh /outside/repo/converter-source` to build the pinned converter/runtime sources. Record the exact source commits of both converter repositories. The converter also
 exports CT2 float32 and retains the whisper.cpp f16 file as controls. Compare
 quantized versions with the full-precision control from the same backend, since
 conversion and decoding can change results independently of quantization.
 
 All three selected checkpoints have been converted to CT2 int8/float32 and
-whisper.cpp f16/q5_0/q4_0. Converted-model inference and CPU cost validation
-remain pending. [Toolchain evidence](report/conversion-toolchain.json) records
+whisper.cpp f16/q5_0/q4_0. Full converted-model inference and CPU cost measurement
+are running; final tables remain pending. [Toolchain evidence](report/conversion-toolchain.json) records
 the pinned conversion tools. For CPU conversion, install
 `pip install -r requirements-conversion.txt` to use the recorded CPU PyTorch
 build. A submitted Kaggle job can be collected with `python -m train.collect_gpu
@@ -141,4 +149,8 @@ metric and native-speaker review are necessary before strong linguistic claims.
 
 Read [background](report/background.md), [methods and results](report/report.md),
 and [remaining work](report/completion.md). Dataset/model licenses are separate
-from the MIT code license. No trained model has been uploaded yet.
+from the MIT code license. The selected model's [card and notices](report/model-release/model-card.md)
+are retained with its publication receipts. `train.publish` creates an external
+staging package, verifies selected/test artifact identities, excludes pickle
+training state and leaves the selected checkpoint unchanged. It only uploads
+when `--publish` is supplied, and requires a new model repository name.

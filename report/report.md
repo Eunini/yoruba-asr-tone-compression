@@ -40,7 +40,8 @@ lexical support: compare each quantized condition with its own backend's float
 control on reference-word positions correctly matched by both outputs. Report
 the remaining tone coverage as well as the full WER and both marginal tone
 scores. This separates tone changes on common words from changes in which words
-can be scored. The paired implementation and compression results remain pending.
+can be scored. The paired implementation is tested; full compression results
+remain pending.
 
 ## Preliminary results
 
@@ -93,6 +94,17 @@ The selected tiny/base/small checkpoints were converted to CT2 int8/float32 and
 whisper.cpp f16/q5_0/q4_0. Conversion receipts hash source and output artifacts.
 Converted-model inference, paired-support comparisons and controlled CPU costs
 remain outstanding; successful conversion alone supplies no compression result.
+
+The validation-selected tiny checkpoint is now public at
+[Ineeoluwa/whisper-tiny-yoruba-waxal-research](https://huggingface.co/Ineeoluwa/whisper-tiny-yoruba-waxal-research),
+revision `2be42141c256433043343784c0b055656004ac9b`. Anonymous download and actual
+weight SHA256 were verified, followed by one real-audio CPU transcription through
+Transformers. These are publication/integration checks, not a new accuracy or
+latency benchmark. The model card reports the weak full-test result prominently,
+and retains data attribution and upstream license notices. Pickle training state
+is excluded. [Release evidence](model-release/publication.json) and
+[download smoke check](model-release/public-download-smoke.json) identify exact
+files and revisions. Immutable selected source weights were left unchanged.
 
 ## Cost chart
 

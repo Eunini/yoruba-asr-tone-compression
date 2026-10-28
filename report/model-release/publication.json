@@ -1,0 +1,33 @@
+{
+  "verified_at": "2026-10-28T00:55:25.707902+00:00",
+  "url": "https://huggingface.co/Ineeoluwa/whisper-tiny-yoruba-waxal-research",
+  "revision": "2be42141c256433043343784c0b055656004ac9b",
+  "public_anonymous_metadata_verified": true,
+  "model_safetensors_sha256": "880795cd4a860271f9a219330b28b6916313b3e11cb19a28ac88cafe152c6f13",
+  "model_license": "cc-by-sa-4.0",
+  "inference_files": [
+    ".gitattributes",
+    "LICENSE",
+    "LICENSE-BASE-APACHE-2.0.txt",
+    "LICENSE-UPSTREAM-WHISPER-MIT.txt",
+    "NOTICE.md",
+    "README.md",
+    "added_tokens.json",
+    "config.json",
+    "evaluation.json",
+    "generation_config.json",
+    "merges.txt",
+    "model.safetensors",
+    "normalizer.json",
+    "preprocessor_config.json",
+    "release-manifest.json",
+    "selection.json",
+    "special_tokens_map.json",
+    "tokenizer.json",
+    "tokenizer_config.json",
+    "vocab.json"
+  ],
+  "pickle_training_state_excluded": true,
+  "publication_source_commit": "1331c960d6aa6b074d70d6ecbf155a7a284ca753",
+  "performance_scope": "Measured research checkpoint with weak 88.7646% WER; full compression/cost study and native error analysis pending"
+}
