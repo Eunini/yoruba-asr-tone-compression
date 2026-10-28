@@ -249,7 +249,10 @@ def main():
             time.sleep(5)
         else:
             raise TimeoutError("New instance SSH did not become ready")
-        remote("sudo cloud-init status --wait", timeout=900)
+        cloud_status = remote("sudo cloud-init status --wait", timeout=900, check=False)
+        if cloud_status not in (0, 2):
+            raise RuntimeError("cloud-init did not complete")
+        remote("test -f /var/lib/afri-benchmark/bootstrap-ready")
         remote("systemctl is-active afri-benchmark-expiry.timer")
         receipt["instance_expiry_timer_verified"] = True
         bootstrap = f"""set -eu

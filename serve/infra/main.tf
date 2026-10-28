@@ -108,25 +108,29 @@ resource "aws_instance" "cpu" {
   instance_initiated_shutdown_behavior = "terminate"
   user_data_replace_on_change          = true
   user_data                            = <<-CLOUD
-    #cloud-config
-    write_files:
-      - path: /etc/ssh/sshd_config.d/afri-research-ports.conf
-        permissions: '0644'
-        content: |
-          Port 22
-          Port 443
-    bootcmd:
-      - [systemd-run, --no-block, --unit=afri-benchmark-expiry, --on-active=${ceil(var.max_hours * 3600)}s, /usr/sbin/shutdown, -h, now]
-      - [sh, -c, "printf 'AFRI benchmark expiry timer queued\\n' > /dev/ttyS0"]
-    package_update: true
-    packages: [git, cmake, build-essential, python3-venv, libsndfile1, libgomp1, rsync, ca-certificates, openssh-server, iptables]
-    runcmd:
-      - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '22', -j, ACCEPT]
-      - [iptables, -I, INPUT, -s, ${var.admin_cidr}, -p, tcp, --dport, '443', -j, ACCEPT]
-      - [systemctl, disable, --now, ssh.socket]
-      - [systemctl, daemon-reload]
-      - [systemctl, enable, ssh.service]
-      - [systemctl, restart, ssh.service]
+    #!/bin/bash
+    set -euo pipefail
+    exec > >(tee -a /var/log/afri-bootstrap.log /dev/console) 2>&1
+    echo 'AFRI: final-stage bootstrap started'
+    # User-data scripts run after the early cloud-init network stage. Do not
+    # invoke systemd transient units from bootcmd before basic boot dependencies.
+    systemd-run --no-block --unit=afri-benchmark-expiry --on-active=${ceil(var.max_hours * 3600)}s /usr/sbin/shutdown -h now
+    printf 'Port 22\nPort 443\n' > /etc/ssh/sshd_config.d/afri-research-ports.conf
+    ssh-keygen -A
+    systemctl disable --now ssh.socket || true
+    systemctl daemon-reload
+    systemctl enable ssh.service
+    systemctl restart ssh.service
+    echo 'AFRI: SSH service restarted with both administrator ports'
+    export DEBIAN_FRONTEND=noninteractive
+    apt-get update
+    apt-get install -y --no-install-recommends git cmake build-essential python3-venv libsndfile1 libgomp1 rsync ca-certificates openssh-server iptables
+    for port in 22 443; do
+      iptables -C INPUT -s ${var.admin_cidr} -p tcp --dport "$port" -j ACCEPT || iptables -I INPUT -s ${var.admin_cidr} -p tcp --dport "$port" -j ACCEPT
+    done
+    install -d /var/lib/afri-benchmark
+    touch /var/lib/afri-benchmark/bootstrap-ready
+    echo 'AFRI: dependency installation complete'
   CLOUD
   root_block_device {
     volume_type           = "gp3"
